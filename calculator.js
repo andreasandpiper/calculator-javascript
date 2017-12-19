@@ -6,16 +6,19 @@ var calculator = {
     '-': function(x,y){ return x - y},
     '/': function(x,y){ return x / y},
     '*': function(x,y){ return x * y}
-
   },
 }
 
 var calculation = {
+  currentNumber: null,
   buttonValue: [],
   clearCalculation: function(){
     this.buttonValue = [];
   },
   calculate: function(){
+    var newValue = new Value('number', this.currentNumber);
+    this.buttonValue.push(newValue);
+    this.currentNumber = null;
     for(var i=0 ; i< this.buttonValue.length ; i++){
       if(this.buttonValue[i].type === 'operand' && this.buttonValue[i+1]){
         //get values before and after
@@ -53,15 +56,19 @@ function displayOnCalculator(item){
 
 function getNumberValue(){
   var item = $(this).text();
-  var newValue = new Value('number', item);
+  if(calculation.currentNumber){
+    calculation.currentNumber += item;
+  } else {
+    calculation.currentNumber = item;
+  }
   displayOnCalculator(item);
-
-  calculation.buttonValue.push(newValue);
 }
 
 function getOperandValue(){
-  if(calculation.buttonValue.length === 0){
-    return;
+  if(calculation.currentNumber){
+    var newValue = new Value('number', calculation.currentNumber);
+    calculation.buttonValue.push(newValue);
+    calculation.currentNumber = null;
   }
   var item = $(this).val();
   var newValue = new Value('operand', item);
