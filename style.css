@@ -1,0 +1,62 @@
+::selection{
+  user-select: none;
+}
+
+*{
+  box-sizing: border-box;
+  font-family: 'Bungee', cursive;
+}
+
+body{
+  background: #06beb6;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #48b1bf, #06beb6);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #48b1bf, #06beb6); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+}
+
+.container {
+  position: relative;
+  background-color: #515151;
+  width: 35vw;
+  box-shadow: 0px 0px 20px 10px rgba(0, 0, 0, 0.2);
+  margin-top: 5vh;
+}
+
+button:focus {
+  outline:0;
+}
+
+.value {
+  width: 21%;
+  cursor: pointer;
+}
+
+.input, .value, .clearRecent, .clear {
+  background-color: #E0E0D9;
+  display: inline-block;
+  margin: 1.5%;
+  padding: 5px;
+  font-size: 30px;
+  text-align: center;
+  border-radius: 10px;
+  box-shadow: 2px 2px 5px 2px rgba(0,0,0,0.5);
+}
+
+.input{
+  height: 15vh;
+  width:90%;
+}
+
+.clearRecent, .clear{
+  width: 33%;
+  cursor: pointer;
+}
+
+.add{
+  position: absolute;
+  height: 24%;
+}
+
+.invisible{
+  visibility: hidden;
+}
