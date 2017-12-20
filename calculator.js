@@ -1,3 +1,10 @@
+// on load page, create new Calculation
+//click on number, add to currentNumber in Calculation
+//click on operand, push currentNumber to equatoin and add to currentOperator
+//click equal, push currentNUmber to equation, calculate number and return
+//display return value on screen
+
+
 var mathOperators =  {
     '+': function(x,y){ return x + y},
     '-': function(x,y){ return x - y},
@@ -10,19 +17,20 @@ function Value(type, value) {
   this.value = value
 }
 
-// var Calculation = {
-//
-// }
+function Calculation(){
+  var calculation = {
+    currentNumber: null,
+    currentOperator: null,
+    arrayOfValues: [],
+  }
+  return Calculation;
+}
 
 var calculator = {
-  currentNumber: null,
-  currentOperator: null,
-  arrayOfValues: [],
+  calculation: null;
   displayScreen: [],
   clearCalculator: function(){
-    this.arrayOfValues = [];
-    this.currentNumber = null;
-    this.currentOperator = null;
+    var calculation = new Calculation();
     $('.input').text("");
     calculator.displayScreen = [];
   },
@@ -94,9 +102,6 @@ var calculator = {
   }
 }
 
-function getAnswer(){
-
-}
 
   //idea: keep an array of operators used, sort them in order of operations and find those values
 
@@ -109,6 +114,7 @@ function initializeApp(){
   $('.operand').on('click', calculator.pressOperandButton.bind(calculator));
   $('.equal').on('click', calculator.calculate.bind(calculator));
   $('.decimal').on('click', calculator.addDecimalToNumber.bind(calculator));
+  calculator.calculation =  new Calculation();
 }
 
 function displayOnCalculator(item){
