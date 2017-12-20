@@ -4,13 +4,14 @@ $(document).ready(initializeApp);
 function initializeApp(){
   $('.number').on('click', calculator.pressNumberButton.bind(calculator));
   $('.clear').on('click', calculator.clearCalculator.bind(calculator));
+  $('.clearEverything').on('click', calculator.clearAllInput.bind(calculator));
   $('.operand').on('click', calculator.pressOperandButton.bind(calculator));
   $('.equal').on('click', calculator.calculate.bind(calculator));
   $('.decimal').on('click', calculator.addDecimalToNumber.bind(calculator));
+  $('.delete').on('click', calculator.deleteLastInput.bind(calculator));
 }
 
-function displayOnCalculator(item){
-  calculator.displayScreen.push(item)
+function displayOnCalculator(){
   $('.input').text(calculator.displayScreen.join(""));
 }
 
@@ -28,78 +29,98 @@ function Value(type, value) {
 
 var calculator = {
   lastFunction: {},
-  currentNumber: null,
-  currentOperator: null,
+  currentNumber: '',
+  currentOperator: '',
+  lastInputSubmitted: null,
   arrayOfInputValues: [],
   displayScreen: [],
+  deleteLastInput: function(){
+
+  },
   clearCalculator: function(){
     this.arrayOfInputValues = [];
-    this.currentNumber = null;
-    this.currentOperator = null;
+    this.currentNumber = '';
+    this.currentOperator = '';
     $('.input').text("");
     calculator.displayScreen = [];
   },
+  clearAllInput: function(){
+    this.lastFunction = {};
+    this.arrayOfInputValues = [];
+    this.currentNumber = '';
+    this.currentOperator = '';
+    this.lastInputSubmitted = null;
+  },
   calculate: function(){
-    // debugger;
-    if(this.arrayOfInputValues.length === 1 && this.lastFunction.operand){
-        //take the first item in arrayOfInputValues
-        var currentSum = parseFloat(this.arrayOfInputValues[0].value)
-        var answer = mathOperators[this.lastFunction.operand]( currentSum, this.lastFunction.num2);
-        var newInput = new Value('number', answer);
-        this.arrayOfInputValues.pop();
-        this.arrayOfInputValues.push(newInput);
-        this.displayScreen.pop();
-        displayOnCalculator(answer);
-    } else if(this.arrayOfInputValues[this.arrayOfInputValues.length -1].type === 'operand'){
-      // debugger;
+    //if no input or first input is an operator, return
+    if(!this.lastInputSubmitted || this.arrayOfInputValues[0].type === "operand"){
+      return;
+    } else if (this.arrayOfInputValues.length ===2 && isNaN(this.lastInputSubmitted)){
+      var addNumberToEquation = new Value('number', this.arrayOfInputValues[0].value);
+      this.arrayOfInputValues.push(addNumberToEquation);
+      getSumOfInput();
+    }else if (this.arrayOfInputValues.length ===1) {
+      //if there is only 1 number input, use previous function
+      var addOperatorToEquation = new Value('operand',this.lastFunction.operand );
+      var addSumToEquation = new Value('number', this.lastFunction.num2);
+      this.arrayOfInputValues.push(addOperatorToEquation, addSumToEquation);
+      getSumOfInput();
+    } else if (isNaN(this.lastInputSubmitted)) {
+      //if the last input is an operand
+      //calculate equation from input
+        //remember last 2 operand and number
+      //change screen display
       var operator = this.arrayOfInputValues.pop();
       if(this.arrayOfInputValues.length !== 1){
         getSumOfInput();
       }
-      var result = mathOperators[operator.value](this.arrayOfInputValues[0].value, this.arrayOfInputValues[0].value);
-      var createResultObject = new Value('number', result);
-      this.arrayOfInputValues = [createResultObject];
-      this.displayScreen = [];
-      this.lastFunction.operand = operator.value;
-      this.lastFunction.num2 = result;
-      displayOnCalculator(result);
-    } else {
+      this.lastFunction.num2 = this.arrayOfInputValues[0].value;
+      var addOperatorToEquation = new Value('operand',this.lastFunction.operand );
+      var addSumToEquation = new Value('number', this.lastFunction.num2);
+      this.arrayOfInputValues.push(addOperatorToEquation, addSumToEquation);
       getSumOfInput();
+    } else {
+      //if the first input is a number
+      var answer = getSumOfInput();
     }
   },
   pressNumberButton: function(){
-    var item = $(event.target).text();
-    if(this.currentNumber){
-      if(this.currentNumber[this.currentNumber.length -1] !== "."){
+    var number = $(event.target).text();
+    if(this.currentNumber.length){
+      if(this.lastInputSubmitted != '.'){
         this.displayScreen.pop();
       }
-      this.currentNumber += item;
       this.arrayOfInputValues.pop();
-    } else {
-      this.currentNumber = item;
     }
+    this.currentNumber += number;
     var newValue = new Value('number', this.currentNumber);
     this.arrayOfInputValues.push(newValue);
-    displayOnCalculator(item);
-    this.currentOperator = null;
+    this.currentOperator = '';
+    this.lastInputSubmitted = this.currentNumber;
+    this.displayScreen.push(number)
+    displayOnCalculator();
   },
   pressOperandButton: function(){
     // debugger;
-    this.currentNumber = null;
-    var item = $(event.target).val();
-    if(this.currentOperator){
+    this.currentNumber = '';
+    var operand = $(event.target).val();
+    if(this.currentOperator.length){
       this.arrayOfInputValues.pop();
       this.displayScreen.pop();
     }
-    this.currentOperator = item;
-    var newValue = new Value('operand', this.currentOperator);
+    this.currentOperator = operand;
+    var newValue = new Value('operand', operand);
     this.arrayOfInputValues.push(newValue);
-    displayOnCalculator(item);
+    this.lastInputSubmitted = this.currentOperator;
+    this.displayScreen.push(operand)
+    displayOnCalculator();
   },
   addDecimalToNumber: function (){
     if(this.currentNumber && this.currentNumber[this.currentNumber.length -1] !== '.'){
       this.currentNumber += ".";
-      displayOnCalculator(".");
+      this.displayScreen.push('.');
+      this.lastInputSubmitted = '.';
+      displayOnCalculator();
     }
   }
 }
@@ -128,7 +149,7 @@ function getSumOfInput(){
     }
     calculator.lastFunction.operand = operator;
     calculator.lastFunction.num2 = num2;
-    calculator.currentOperator = null;
+    calculator.currentOperator = "";
   }
   return equation;
 }
