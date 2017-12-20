@@ -43,6 +43,13 @@ button:focus {
 }
 
 .input{
+  border-radius: 0px;
+  border-width:5px;
+  border-color: #505050 #C8C8C8 #C8C8C8 #505050 ;
+
+}
+
+.input{
   height: 15vh;
   width:90%;
 }
