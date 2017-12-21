@@ -3,7 +3,7 @@ $(document).ready(initializeApp);
 function initializeApp(){
   $('.number').on('click', calculator.pressNumberButton.bind(calculator));
   $('.clear').on('click', calculator.clearCalculator.bind(calculator));
-  $('.clearEverything').on('click', calculator.clearAllInput.bind(calculator));
+  $('.clearEntry').on('click', calculator.clearLastInput.bind(calculator));
   $('.operand').on('click', calculator.pressOperandButton.bind(calculator));
   $('.equal').on('click', calculator.calculate.bind(calculator));
   $('.decimal').on('click', calculator.addDecimalToNumber.bind(calculator));
@@ -43,16 +43,16 @@ var calculator = {
     $('.input').text("");
     calculator.displayScreen = [];
   },
-  clearAllInput: function(){
-    this.lastFunction = {};
-    this.arrayOfInputValues = [];
-    this.currentNumber = '';
-    this.currentOperator = '';
-    this.lastInputSubmitted = null;
-  },
+  // clearAllInput: function(){
+  //   this.lastFunction = {};
+  //   this.arrayOfInputValues = [];
+  //   this.currentNumber = '';
+  //   this.currentOperator = '';
+  //   this.lastInputSubmitted = null;
+  // },
   calculate: function(){
     //if no input or first input is an operator, return
-    if(!this.lastInputSubmitted || this.arrayOfInputValues[0].type === "operand"){
+    if(!this.lastInputSubmitted || this.arrayOfInputValues[0].type === "operand" || this.lastInputSubmitted === '.'){
       return;
     } else if (this.arrayOfInputValues.length ===2 && isNaN(this.lastInputSubmitted)){
       var addNumberToEquation = new Value('number', this.arrayOfInputValues[0].value);
@@ -86,9 +86,9 @@ var calculator = {
   pressNumberButton: function(){
     var number = $(event.target).text();
     if(this.currentNumber.length){
-      if(this.lastInputSubmitted != '.'){
-        this.displayScreen.pop();
-      }
+      // if(this.lastInputSubmitted != '.'){
+      //   this.displayScreen.pop();
+      // }
       this.arrayOfInputValues.pop();
     }
     this.currentNumber += number;
@@ -107,20 +107,63 @@ var calculator = {
       this.arrayOfInputValues.pop();
       this.displayScreen.pop();
     }
+    if(this.lastInputSubmitted === '.'){
+
+    }
     this.currentOperator = operand;
     var newValue = new Value('operand', operand);
     this.arrayOfInputValues.push(newValue);
     this.lastInputSubmitted = this.currentOperator;
-    this.displayScreen.push(operand)
+    this.displayScreen.push(operand);
     displayOnCalculator();
   },
   addDecimalToNumber: function (){
-    if(this.currentNumber && this.currentNumber[this.currentNumber.length -1] !== '.'){
+    if(this.currentNumber && this.currentNumber[this.currentNumber.length -1] !== '.' && this.currentNumber.indexOf('.') === -1){
       this.currentNumber += ".";
-      this.displayScreen.push('.');
       this.lastInputSubmitted = '.';
+      this.displayScreen.push(".")
       displayOnCalculator();
     }
+  },
+  clearLastInput: function(){
+    var inputDeleted = this.displayScreen.pop();
+    if(!isNaN(inputDeleted) && this.currentNumber.length === 1 || inputDeleted === "." || !this.lastInputSubmitted){
+      this.arrayOfInputValues.pop();
+      this.currentNumber = '';
+      this.currentOperator = inputDeleted;
+    }
+    else if (!isNaN(inputDeleted) || inputDeleted === "." ){
+        this.arrayOfInputValues.pop();
+        var number = this.currentNumber.slice(0, this.currentNumber.length - 1);
+        var newNumber = new Value('number', number);
+        this.arrayOfInputValues.push(newNumber);
+        this.currentNumber = number;
+    }
+    else{
+      this.arrayOfInputValues.pop();
+      this.currentOperator = "";
+      this.currentNumber = this.arrayOfInputValues[this.arrayOfInputValues.length - 1].value;
+      displayOnCalculator();
+    }
+    this.lastInputSubmitted = this.displayScreen[this.displayScreen.length - 1];
+    // var lastSubmitted = this.displayScreen.pop()
+    // if(!isNaN(lastSubmitted) || this.lastInputSubmitted === '.'){
+    //   if(lastSubmitted === this.arrayOfInputValues[this.arrayOfInputValues.length - 1].value){
+    //     this.arrayOfInputValues.pop();
+    //   } else {
+    //     var removeLastDigitOfTargetNumber = this.arrayOfInputValues[this.arrayOfInputValues.length - 1].value.slice(0,-1);
+    //     var newNumber = this.arrayOfInputValues[this.arrayOfInputValues.length - 1].value.slice(0, this.arrayOfInputValues.length);
+    //     console.log(removeLastDigitOfTargetNumber)
+    //     this.arrayOfInputValues[this.arrayOfInputValues.length - 1].value = newNumber;
+    //     this.currentNumber = removeLastDigitOfTargetNumber;
+    //     this.lastInputSubmitted = removeLastDigitOfTargetNumber;
+    //   }
+    // } else {
+    //   this.arrayOfInputValues.pop();
+    //   this.currentOperator = '';
+    //   this.lastInputSubmitted = this.displayScreen[this.displayScreen.length -1];
+    // }
+    displayOnCalculator();
   }
 }
   //idea: keep an array of operators used, sort them in order of operations and find those values
@@ -132,6 +175,7 @@ function getSumOfInput(){
       var num1 = parseFloat(calculator.arrayOfInputValues[i-1].value);
       var num2 = parseFloat(calculator.arrayOfInputValues[i+1].value);
       var equation = mathOperators[operator](num1, num2);
+      equation = equation.toString();
       var answer = new Value('number', equation);
       calculator.arrayOfInputValues.splice(i-1, 3, answer);
       i = i-1;
@@ -146,6 +190,7 @@ function getSumOfInput(){
       $('.input').text(equation);
       calculator.displayScreen = [equation];
     }
+    this.lastInputSubmitted = null;
     calculator.lastFunction.operand = operator;
     calculator.lastFunction.num2 = num2;
     calculator.currentOperator = "";

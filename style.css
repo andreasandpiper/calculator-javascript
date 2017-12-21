@@ -31,7 +31,7 @@ button:focus {
   cursor: pointer;
 }
 
-.input, .value, .clearEverything, .clear {
+.input, .value, .clearEntry, .clear {
   background-color: #E0E0D9;
   display: inline-block;
   margin: 1.5%;
@@ -54,10 +54,10 @@ button:focus {
   width:90%;
 }
 
-/*.clearEverything, .clear{
+.clearEntry, .clear{
   width: 33%;
   cursor: pointer;
-}*/
+}
 
 .add{
   position: absolute;
