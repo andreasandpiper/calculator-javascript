@@ -127,7 +127,7 @@ var calculator = {
   },
   clearLastInput: function(){
     var inputDeleted = this.displayScreen.pop();
-    if(!isNaN(inputDeleted) && this.currentNumber.length === 1 || inputDeleted === "." || !this.lastInputSubmitted){
+    if(this.currentNumber.length === 1 && inputDeleted != "." || !this.lastInputSubmitted){
       this.arrayOfInputValues.pop();
       this.currentNumber = '';
       this.currentOperator = inputDeleted;
