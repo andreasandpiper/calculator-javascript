@@ -87,6 +87,9 @@ var calculator = {
     }
   },
   pressNumberButton: function(){
+    if(this.displayScreen.length > 9){
+      return false;
+    }
     var number = $(event.target).text();
     if(this.currentNumber.length){
       // if(this.lastInputSubmitted != '.'){
@@ -103,8 +106,7 @@ var calculator = {
     displayOnCalculator();
   },
   pressOperandButton: function(){
-    // debugger;
-    if(this.arrayOfInputValues.length === 0){
+    if(this.arrayOfInputValues.length === 0 || this.displayScreen.length > 9){
       return;
     }
     this.currentNumber = '';
@@ -124,8 +126,12 @@ var calculator = {
     displayOnCalculator();
   },
   addDecimalToNumber: function (){
-    if(this.currentNumber || this.currentNumber.indexOf('.') === -1){
-      this.arrayOfInputValues.pop();
+    if(this.displayScreen.length > 9){
+      return;
+    }    if(this.currentNumber.indexOf('.') === -1){
+      if(this.currentNumber){
+        this.arrayOfInputValues.pop();
+      }
       this.currentNumber += ".";
       var newNumber = new Value('number', this.currentNumber);
       this.arrayOfInputValues.push(newNumber);
@@ -174,6 +180,12 @@ function getSumOfInput(){
         var num1 = parseFloat(calculator.arrayOfInputValues[i-1].value);
         num2 = parseFloat(calculator.arrayOfInputValues[i+1].value);
         equation = mathOperators[operator](num1, num2);
+        if(equation.toString().length > 6){
+          equation = equation.toExponential();
+        }
+        // if(equation.toString().includes(".") && equation.toString().length > 6){
+        //   equation = equation.toFixed(5);
+        // }
         equation = equation.toString();
         var answer = new Value('number', equation);
         calculator.arrayOfInputValues.splice(i-1, 3, answer);

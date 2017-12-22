@@ -43,10 +43,12 @@ button:focus {
 }
 
 .input{
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9vmin;
+  text-align: right;
   border-radius: 0px;
   border-width:5px;
   border-color: #505050 #C8C8C8 #C8C8C8 #505050 ;
-
 }
 
 .input{
