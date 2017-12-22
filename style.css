@@ -13,14 +13,21 @@ body{
   background: linear-gradient(to right, #48b1bf, #06beb6); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 
 }
-
 .container {
   position: relative;
-  background-color: #515151;
-  width: 35vw;
-  box-shadow: 0px 0px 20px 10px rgba(0, 0, 0, 0.2);
-  margin-top: 5vh;
+  min-width:580px;
+  width: 30%;
+  margin: 5% auto;
 }
+.calculator {
+  /*width: 40%;*/
+  background-color: #515151;
+  position: relative;
+  box-shadow: 0px 0px 20px 14px rgba(0, 0, 0, 0.5);
+  border-radius: 0px;
+  border:    8px solid #606060;
+}
+
 
 button:focus {
   outline:0;
@@ -39,22 +46,21 @@ button:focus {
   font-size: 30px;
   text-align: center;
   border-radius: 10px;
-  box-shadow: 2px 2px 5px 2px rgba(0,0,0,0.5);
+  box-shadow: 2px 2px 1px 5px rgba(0,0,0,0.5);
 }
 
 .input{
   font-family: 'Share Tech Mono', monospace;
+  height: 15%;
+  width:95%;
   font-size: 9vmin;
   text-align: right;
+  border-style: solid;
   border-radius: 0px;
-  border-width:5px;
+  border-width:8px;
   border-color: #505050 #C8C8C8 #C8C8C8 #505050 ;
 }
 
-.input{
-  height: 15vh;
-  width:90%;
-}
 
 .clearEntry, .clear{
   width: 33%;
@@ -68,4 +74,19 @@ button:focus {
 
 .invisible{
   visibility: hidden;
+}
+
+footer {
+  width: 100%;
+  margin: 0 auto;
+  margin-top: 2%;
+  text-align: center;
+  font-size: 2vmin;
+}
+
+footer a {
+  font-size: 2vmin;
+  color: #505050;
+  text-decoration: none;
+  cursor: pointer;
 }

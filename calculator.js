@@ -10,6 +10,10 @@ function initializeApp(){
 }
 
 function displayOnCalculator(){
+  if(calculator.displayScreen.length === 0){
+    $('.input').text("0");
+    return;
+  }
   $('.input').text(calculator.displayScreen.join(""));
 }
 
