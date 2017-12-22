@@ -7,6 +7,8 @@ function initializeApp(){
   $('.operand').on('click', calculator.pressOperandButton.bind(calculator));
   $('.equal').on('click', calculator.calculate.bind(calculator));
   $('.decimal').on('click', calculator.addDecimalToNumber.bind(calculator));
+  $('.parentheses').on('click', calculator.addParentheses.bind(calculator));
+
 }
 
 function displayOnCalculator(){
@@ -36,6 +38,9 @@ var calculator = {
   lastInputSubmitted: null,
   arrayOfInputValues: [],
   displayScreen: [],
+  inParentheses: false,
+  beginParenArray = [];
+  endParenArray = [],
   clearCalculator: function(message){
     message = message || " ";
     this.arrayOfInputValues = [];
@@ -44,18 +49,33 @@ var calculator = {
     this.lastFunction = {};
     this.lastInputSubmitted = null;
     calculator.displayScreen = [];
+    this.beginParenArray = [],
+    this.endParenArray = [],
     $('.input').text(message);
   },
-  // clearAllInput: function(){
-  //   this.lastFunction = {};
-  //   this.arrayOfInputValues = [];
-  //   this.currentNumber = '';
-  //   this.currentOperator = '';
-  //   this.lastInputSubmitted = null;
-  // },
+  addParentheses: function(){
+    //get value
+    var paren = $(event.target).val();
+    var addToEquation = new Value('parentheses', paren);
+    if(paren === "("){
+      if(this.currentNumber && !this.parentheses){
+        this.arrayOfInputValues.push(new Value('operand', "*"));
+        this.currentNumber = '';
+      }
+      this.beginParenArray.push(paren);
+      this.inParentheses = true;
+    } else {
+      this.endParenArray.push(paren);
+      this.inParentheses = false;
+    }
+    this.arrayOfInputValues.push(addToEquation);
+    this.lastInputSubmitted = paren;
+    this.displayScreen.push(paren);
+    displayOnCalculator();
+  },
   calculate: function(){
     //if no input or first input is an operator, return
-    if(!this.lastInputSubmitted || this.arrayOfInputValues[0].type === "operand" || this.lastInputSubmitted === '.'){
+    if(!this.lastInputSubmitted || this.arrayOfInputValues[0].type === "operand" || this.lastInputSubmitted === '.' || this.inParentheses || this.beginParenArray.length !== this.endParenArray.length)){
       // $('.input').text('0');
       return;
     } else if (this.arrayOfInputValues.length ===2 && isNaN(this.lastInputSubmitted)){
@@ -91,7 +111,7 @@ var calculator = {
     }
   },
   pressNumberButton: function(){
-    if(this.displayScreen.length > 9){
+    if(this.displayScreen.length > 9 || this.lastInputSubmitted === ")"){
       return false;
     }
     var number = $(event.target).text();
@@ -167,15 +187,39 @@ var calculator = {
     this.lastInputSubmitted = this.displayScreen[this.displayScreen.length - 1];
     displayOnCalculator();
   }
+},
+function parentheses(array){
+  var indexOfBeginParen;
+  var indexOfEndParen;
+  if(this.beginParenArray.length){
+    indexOfBeginParen = this.beginParenArray.length - 1;
+    for(var i=indexOfBeginParen -1 ; i >= 0; i--){
+      //find the number that is closest to, but not below
+      for(var innerLoopIndex = 0; innerLoopIndex < this.endParenArray.length ; innerLoopIndex++){
+        if(this.endParenArray[innerLoopIndex] > this.beginParenArray[i]){
+          indexOfEndParen = innerLoopIndex;
+        }
+      }
+
+  }
+  var copyOfSectionInParentheses = this.arrayOfInputValues.slice(indexOfBeginParen + 1, indexOfEndParen);
+  this.arrayOfInputValues.splice(indexOfBeginParen, 1);
+  this.arrayOfInputValues.splice(indexOfEndParen + 1, 1);
+
 }
   //idea: keep an array of operators used, sort them in order of operations and find those values
 function getSumOfInput(){
+  while(this.beginParenArray.length){
+
+  }
+
   var orderOfOperations = ['*', "/", "+", "-"];
   var equation;
   var num2;
   //loop through order of operations
   //find index for operation
   var operandIndex = 0;
+
   while(operandIndex < orderOfOperations.length){
     for(var i=0 ; i< calculator.arrayOfInputValues.length ; i++){
       if(calculator.arrayOfInputValues[i].value === orderOfOperations[operandIndex]){
@@ -187,9 +231,6 @@ function getSumOfInput(){
         if(equation.toString().length > 6){
           equation = equation.toExponential();
         }
-        // if(equation.toString().includes(".") && equation.toString().length > 6){
-        //   equation = equation.toFixed(5);
-        // }
         equation = equation.toString();
         var answer = new Value('number', equation);
         calculator.arrayOfInputValues.splice(i-1, 3, answer);
