@@ -247,7 +247,7 @@ function getSumOfInput(){
           }
         }
       }
-      debugger;
+      // debugger;
       var copyOfSectionInParentheses = calculator.arrayOfInputValues.slice(indexOfBeginParen+1 - arrayLengthShortened, indexOfEndParen - arrayLengthShortened);
       var sumOfCopy =  new Value('number',sum(copyOfSectionInParentheses));
       calculator.arrayOfInputValues.splice(indexOfBeginParen- arrayLengthShortened, indexOfEndParen + 1- arrayLengthShortened, sumOfCopy);
