@@ -8,6 +8,7 @@ function initializeApp(){
   $('.equal').on('click', calculator.calculate.bind(calculator));
   $('.decimal').on('click', calculator.addDecimalToNumber.bind(calculator));
   $('.parentheses').on('click', calculator.addParentheses.bind(calculator));
+  $('.squareRoot').on('click', calculator.squareRoot.bind(calculator));
 
 }
 
@@ -41,6 +42,7 @@ var calculator = {
   inParentheses: false,
   beginParenArray: [],
   endParenArray: [],
+  squareRootClicked: false,
   clearCalculator: function(message){
     message = message || " ";
     this.arrayOfInputValues = [];
@@ -51,6 +53,7 @@ var calculator = {
     calculator.displayScreen = [];
     this.beginParenArray = [],
     this.endParenArray = [],
+    this.squareRootClicked = false;
     $('.input').text(message);
   },
   addParentheses: function(){
@@ -78,7 +81,15 @@ var calculator = {
     if(!this.lastInputSubmitted || this.arrayOfInputValues[0].type === "operand" || this.lastInputSubmitted === '.' || this.inParentheses || this.beginParenArray.length !== this.endParenArray.length){
       // $('.input').text('0');
       return;
-    } else if (this.arrayOfInputValues.length ===2 && isNaN(this.lastInputSubmitted)){
+    } else if (this.squareRootClicked && !isNaN(this.lastInputSubmitted)){
+      this.arrayOfInputValues.pop();
+      this.currentNumber += "))";
+      var newValue = new Value('number', this.currentNumber);
+      this.arrayOfInputValues.push(newValue);
+      this.squareRootClicked = false;
+      getSumOfInput();
+    }
+    else if (this.arrayOfInputValues.length ===2 && isNaN(this.lastInputSubmitted)){
       var addNumberToEquation = new Value('number', this.arrayOfInputValues[0].value);
       this.arrayOfInputValues.push(addNumberToEquation);
       getSumOfInput();
@@ -115,17 +126,20 @@ var calculator = {
       return false;
     }
     var number = $(event.target).text();
+
     if(this.currentNumber.length){
-      // if(this.lastInputSubmitted != '.'){
-      //   this.displayScreen.pop();
-      // }
       this.arrayOfInputValues.pop();
     }
     this.currentNumber += number;
+    this.currentOperator = '';
     var newValue = new Value('number', this.currentNumber);
     this.arrayOfInputValues.push(newValue);
-    this.currentOperator = '';
-    this.lastInputSubmitted = this.currentNumber;
+    if(this.squareRootClicked){
+      this.lastInputSubmitted = number;
+      this.lastInputSubmitted = number;
+    } else {
+      this.lastInputSubmitted = this.currentNumber;
+    }
     this.displayScreen.push(number)
     displayOnCalculator();
   },
@@ -133,7 +147,6 @@ var calculator = {
     if(this.arrayOfInputValues.length === 0 || this.displayScreen.length > 9){
       return;
     }
-    this.currentNumber = '';
     var operand = $(event.target).val();
     if(this.currentOperator.length){
       this.arrayOfInputValues.pop();
@@ -142,6 +155,14 @@ var calculator = {
     if(this.lastInputSubmitted === '.'){
       return;
     }
+    if(this.squareRootClicked){
+      this.arrayOfInputValues.pop();
+      this.currentNumber += "))";
+      var newValue = new Value('number', this.currentNumber);
+      this.arrayOfInputValues.push(newValue);
+      this.squareRootClicked = false;
+    }
+    this.currentNumber = '';
     this.currentOperator = operand;
     var newValue = new Value('operand', operand);
     this.arrayOfInputValues.push(newValue);
@@ -186,6 +207,18 @@ var calculator = {
     }
     this.lastInputSubmitted = this.displayScreen[this.displayScreen.length - 1];
     displayOnCalculator();
+  },
+  squareRoot: function(){
+    if(this.currentOperator === "" && this.lastInputSubmitted){
+      return;
+    }
+    this.squareRootClicked = true;
+    this.currentNumber += "(Math.sqrt(";
+    var newNumber = new Value('number', this.currentNumber);
+    this.arrayOfInputValues.push(newNumber);
+    this.lastInputSubmitted = 'squareroot';
+    this.displayScreen.push("sqrt.")
+    displayOnCalculator();
   }
 }
 
@@ -193,7 +226,7 @@ function sum(array){
   if(array.length === 1){
     return array;
   }
-  var orderOfOperations = ['*', "/", "+", "-"];
+  var orderOfOperations = ['Math.sqrt', '*', "/", "+", "-"];
   var equation;
   var num2;
   //loop through order of operations
@@ -249,6 +282,7 @@ function getSumOfInput(){
       }
       // debugger;
       var copyOfSectionInParentheses = calculator.arrayOfInputValues.slice(indexOfBeginParen+1 - arrayLengthShortened, indexOfEndParen - arrayLengthShortened);
+      console.log(copyOfSectionInParentheses)
       var sumOfCopy =  new Value('number',sum(copyOfSectionInParentheses));
       calculator.arrayOfInputValues.splice(indexOfBeginParen- arrayLengthShortened, indexOfEndParen + 1- arrayLengthShortened, sumOfCopy);
       calculator.beginParenArray.splice(calculator.beginParenArray.indexOf(indexOfBeginParen- arrayLengthShortened), 1);
