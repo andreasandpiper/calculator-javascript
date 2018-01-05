@@ -42,6 +42,11 @@ button:focus {
   width: 8.5%;
 }
 
+.equal{
+  width: 45.5%;
+
+}
+
 .input, .value, .clearEntry, .clear {
   background-color: #E0E0D9;
   display: inline-block;
