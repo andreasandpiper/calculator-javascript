@@ -33,18 +33,18 @@ button:focus {
   outline:0;
 }
 
-.value, .clearEntry, .clear {
+.value {
   width: 21%;
   cursor: pointer;
 }
 
-.parentheses {
-  width: 8.5%;
+.clearEntry, .clear {
+  width: 33%;
+  cursor: pointer;
 }
 
 .equal{
   width: 45.5%;
-
 }
 
 .input, .value, .clearEntry, .clear {

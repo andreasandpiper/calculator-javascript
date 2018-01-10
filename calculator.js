@@ -7,8 +7,6 @@ function initializeApp(){
   $('.operand').on('click', calculator.pressOperandButton.bind(calculator));
   $('.equal').on('click', calculator.calculate.bind(calculator));
   $('.decimal').on('click', calculator.addDecimalToNumber.bind(calculator));
-  $('.parentheses').on('click', calculator.addParentheses.bind(calculator));
-
 }
 
 function displayOnCalculator(){
@@ -191,7 +189,7 @@ var calculator = {
 
 function sum(array){
   if(array.length === 1){
-    return array[0].value;
+    return array;
   }
   var orderOfOperations = ['*', "/", "+", "-"];
   var equation;
@@ -223,7 +221,12 @@ function sum(array){
     // $('.input').text("error");
     calculator.clearCalculator('error');
     return;
-  } else {
+  } else if (equation.length > 7) {
+    var number = parseFloat(equation);
+    number = number.toPrecision(6);
+    equation = number.toString();
+  }
+  else {
     calculator.currentNumber = equation;
   }
   // calculator.lastInputSubmitted = null;
@@ -235,36 +238,30 @@ function sum(array){
   //idea: keep an array of operators used, sort them in order of operations and find those values
 function getSumOfInput(){
   var arrayLengthShortened = 0;
-  calculator.beginParenArray = calculator.beginParenArray.sort().reverse();
-  calculator.endParenArray = calculator.endParenArray.sort();
-
-  while(calculator.arrayOfInputValues.length > 1){
+  while(calculator.beginParenArray.length){
       var indexOfBeginParen;
-      var indexOfEndParen = calculator.endParenArray[0];
-      var lengthOfSection = 0;
-      for(var beginPindex = 0 ; beginPindex < this.beginParenArray ; beginPindex++ ){
-        if(calculator.beginParenArray[beginPindex] < indexOfEndParen){
-          indexOfBeginParen = calculator.beginParenArray[beginPindex];
-          var sectionInParentheses = calculator.arrayOfInputValues.slice(indexOfBeginParen + 1 - lengthOfSection, indexOfEndParen - lengthOfSection);
-          var sumOfSection = new Value('number', sum(sectionInParentheses));
-          calculator.arrayOfInputValues.splice(indexOfBeginParen - lengthOfSection, indexOfEndParen + 1 - lengthOfSection, sumOfSection)
-          this.beginParenArray.splice(beginPindex, 1)//remove used begin parenthese
-          lengthOfSection = indexOfEndParen - indexOfBeginParen;
+      var indexOfEndParen;
+      for(var outerLoopIndex=calculator.beginParenArray.length - 1 ; outerLoopIndex >= 0; outerLoopIndex--){
+        indexOfBeginParen = calculator.beginParenArray[outerLoopIndex];
+        //find the number that is closest to, but not below
+        for(var innerLoopIndex = calculator.endParenArray.length - 1; innerLoopIndex >= 0  ; innerLoopIndex--){
+          if(calculator.endParenArray[innerLoopIndex] > indexOfBeginParen){
+            indexOfEndParen = calculator.endParenArray[innerLoopIndex];
+          }
         }
       }
-      var result = sum(calculator.arrayOfInputValues);
-      calculator.displayScreen = [result]
-      displayOnCalculator();
-      // var copyOfSectionInParenbegintheses = calculator.arrayOfInputValues.slice(indexOfBeginParen+1 - arrayLengthShortened, indexOfEndParen - arrayLengthShortened);
-      // var sumOfCopy =  new Value('number',sum(copyOfSectionInParentheses));
-      // calculator.arrayOfInputValues.splice(indexOfBeginParen- arrayLengthShortened, indexOfEndParen + 1- arrayLengthShortened, sumOfCopy);
-      // calculator.beginParenArray.splice(calculator.beginParenArray.indexOf(indexOfBeginParen- arrayLengthShortened), 1);
-      // calculator.endParenArray.splice(calculator.endParenArray.indexOf(indexOfEndParen- arrayLengthShortened), 1);
-      // arrayLengthShortened = indexOfEndParen - indexOfBeginParen;
-      // indexOfEndParen = null;
-      // indexOfBeginParen = null;
+      // debugger;
+      var copyOfSectionInParentheses = calculator.arrayOfInputValues.slice(indexOfBeginParen+1 - arrayLengthShortened, indexOfEndParen - arrayLengthShortened);
+      var sumOfCopy =  new Value('number',sum(copyOfSectionInParentheses));
+      calculator.arrayOfInputValues.splice(indexOfBeginParen- arrayLengthShortened, indexOfEndParen + 1- arrayLengthShortened, sumOfCopy);
+      calculator.beginParenArray.splice(calculator.beginParenArray.indexOf(indexOfBeginParen- arrayLengthShortened), 1);
+      calculator.endParenArray.splice(calculator.endParenArray.indexOf(indexOfEndParen- arrayLengthShortened), 1);
+      arrayLengthShortened = indexOfEndParen - indexOfBeginParen;
+      indexOfEndParen = null;
+      indexOfBeginParen = null;
   }
-  // var result = sum(calculator.arrayOfInputValues);
-  // calculator.displayScreen= [result];
-  // displayOnCalculator();
+
+  var result = sum(calculator.arrayOfInputValues);
+  calculator.displayScreen= [result];
+  displayOnCalculator();
 }
