@@ -12,6 +12,17 @@ var calculator = {
     lastOperatorUsed: "",
 }
 
+$(document).ready(initializeApp);
+
+function initializeApp(){
+  $('.number').on('click', calculator.pressNumberButton.bind(calculator));
+  $('.clear').on('click', calculator.clearCalculator.bind(calculator, "0"));
+  $('.clearEntry').on('click', calculator.clearLastInput.bind(calculator));
+  $('.operand').on('click', calculator.pressOperandButton.bind(calculator));
+  $('.equal').on('click', calculator.calculate.bind(calculator));
+  $('.decimal').on('click', calculator.addDecimalToNumber.bind(calculator));
+}
+
 //objective: calculate user input, call filterArray, call getSumOfInput, call displayOnCalculator
 //return: none
 calculator.calculate = function(){
@@ -24,7 +35,7 @@ calculator.calculate = function(){
    //if the input is a number, push operand and value of last function
    if(this.arrayOfInputValues.length === 1 && this.lastFunction.operand){
      var addOperatorToEquation = new Value('operand',this.lastFunction.operand );
-    var addSumToEquation = new Value('number', this.lastFunction.num2);
+     var addSumToEquation = new Value('number', this.lastFunction.num2);
     this.arrayOfInputValues.push(addOperatorToEquation, addSumToEquation);
    }
 
@@ -34,6 +45,9 @@ calculator.calculate = function(){
    }
    this.arrayOfInputValues = this.filterArray();
    result = getSumOfInput(calculator.arrayOfInputValues);
+   if(!result){
+     return;
+   }
 
    //if last value is operand, push last operand and sum of equation and concat, calling sumofINput
    if(lastValueInArray.type === "operand"){
@@ -95,7 +109,7 @@ calculator.pressOperandButton = function(){
 }
 
 calculator.addDecimalToNumber = function (){
-  var newNumber = new Value('decimal', ".");
+  var newNumber = new Value('number', ".");
    this.arrayOfInputValues.push(newNumber);
    this.displayScreen.push(".")
    displayOnCalculator();
@@ -108,7 +122,7 @@ calculator.clearLastInput = function(){
   displayOnCalculator();
 }
 
-calculator.clearCalculator = function(message){
+calculator.clearCalculator = function(){
   this.lastFunction = {},
   this.arrayOfInputValues = [],
   this.displayScreen = [],
@@ -129,8 +143,9 @@ function getSumOfInput(array){
   }
   var result = calculateEquation(array);
   if(result === "Infinity"){
-    calculator.clearCalculator('error');
-    return;
+    calculator.clearCalculator();
+    $('.input').text('error');
+    return false;;
   }
   else {
     calculator.currentNumber = result;
@@ -180,15 +195,4 @@ function displayOnCalculator(){
     return;
   }
   $('.input').text(calculator.displayScreen.join(""));
-}
-
-$(document).ready(initializeApp);
-
-function initializeApp(){
-  $('.number').on('click', calculator.pressNumberButton.bind(calculator));
-  $('.clear').on('click', calculator.clearCalculator.bind(calculator, "0"));
-  $('.clearEntry').on('click', calculator.clearLastInput.bind(calculator));
-  $('.operand').on('click', calculator.pressOperandButton.bind(calculator));
-  $('.equal').on('click', calculator.calculate.bind(calculator));
-  $('.decimal').on('click', calculator.addDecimalToNumber.bind(calculator));
 }
